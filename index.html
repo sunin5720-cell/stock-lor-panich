@@ -808,56 +808,109 @@
       font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
     }
 
-    @media (max-width: 768px) {
-      .header h1 {
-        font-size: 24px;
-      }
+    /* ปรับเลย์เอาต์สำหรับมือถือ */
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+    padding: 10px;
+  }
 
-      .header p {
-        font-size: 18px;
-      }
+  .header {
+    padding: 25px 18px 28px 18px;
+    margin-bottom: 15px;
+    border-radius: 20px;
+  }
 
-      .search-filter-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
+  .header h1 {
+    font-size: 22px;
+  }
 
-      .search-box {
-        min-width: 100%;
-      }
+  .shop-badge {
+    font-size: 20px;
+    padding: 8px 20px;
+    letter-spacing: 2px;
+  }
 
-      .filter-select {
-        min-width: 100%;
-      }
+  .header-subtitle {
+    font-size: 12px;
+  }
 
-      table {
-        font-size: 14px;
-      }
+  .admin-btn {
+    width: 100%;
+    max-width: 260px;
+    margin-top: 10px;
+    justify-content: center;
+    text-align: center;
+  }
 
-      .table-card {
-        padding: 15px;
-      }
+  .controls-card,
+  .table-card,
+  .form-card,
+  .login-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
 
-      tbody td {
-        padding: 10px 8px;
-      }
+  .search-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
 
-      .product-image {
-        width: 48px;
-        height: 48px;
-      }
+  .search-box {
+    min-width: 100%;
+  }
 
-      .theme-toggle-btn {
-        top: 15px;
-        right: 15px;
-        padding: 8px 16px;
-        font-size: 14px;
-      }
+  .filter-select {
+    min-width: 100%;
+  }
 
-      .theme-icon {
-        font-size: 16px;
-      }
-    }
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  thead th {
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+
+  tbody td {
+    padding: 8px 6px;
+  }
+
+  .product-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .theme-toggle-btn {
+    top: 15px;
+    right: 15px;
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .theme-icon {
+    font-size: 16px;
+  }
+}
+
+/* ตัดชื่อสินค้ายาว ๆ ให้ไม่กินพื้นที่ทั้งจอมือถือ */
+@media (max-width: 600px) {
+  /* คอลัมน์ชื่อสินค้า (คอลัมน์ที่ 3) */
+  td:nth-child(3) {
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* แสดง ... ต่อท้าย */
+  }
+}
 
     /* Dark Mode Styles */
     body.dark-mode {
@@ -2007,3 +2060,4 @@
   </script>
 </body>
 </html>
+

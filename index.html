@@ -755,6 +755,7 @@
 
     .swal2-popup {
       border-radius: 20px;
+      padding: 24px 20px;
     }
 
     .swal2-confirm {
@@ -809,108 +810,113 @@
     }
 
     /* ปรับเลย์เอาต์สำหรับมือถือ */
-@media (max-width: 768px) {
-  .container {
-    max-width: 100%;
-    padding: 10px;
-  }
+    @media (max-width: 768px) {
+      .container {
+        max-width: 100%;
+        padding: 10px;
+      }
 
-  .header {
-    padding: 25px 18px 28px 18px;
-    margin-bottom: 15px;
-    border-radius: 20px;
-  }
+      .header {
+        padding: 30px 18px 24px 18px;
+        margin-bottom: 15px;
+        border-radius: 20px;
+      }
 
-  .header h1 {
-    font-size: 22px;
-  }
+      .header h1 {
+        font-size: 22px;
+      }
 
-  .shop-badge {
-    font-size: 20px;
-    padding: 8px 20px;
-    letter-spacing: 2px;
-  }
+      .shop-badge {
+        font-size: 20px;
+        padding: 8px 20px;
+        letter-spacing: 2px;
+      }
 
-  .header-subtitle {
-    font-size: 12px;
-  }
+      .header-subtitle {
+        font-size: 12px;
+      }
 
-  .admin-btn {
-    width: 100%;
-    max-width: 260px;
-    margin-top: 10px;
-    justify-content: center;
-    text-align: center;
-  }
+      .admin-btn {
+        width: 100%;
+        max-width: 260px;
+        margin-top: 10px;
+        justify-content: center;
+        text-align: center;
+      }
 
-  .controls-card,
-  .table-card,
-  .form-card,
-  .login-card {
-    padding: 16px;
-    border-radius: 16px;
-  }
+      .controls-card,
+      .table-card,
+      .form-card,
+      .login-card {
+        padding: 16px;
+        border-radius: 16px;
+      }
 
-  .search-filter-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
+      .search-filter-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
 
-  .search-box {
-    min-width: 100%;
-  }
+      .search-box {
+        min-width: 100%;
+      }
 
-  .filter-select {
-    min-width: 100%;
-  }
+      .filter-select {
+        min-width: 100%;
+      }
 
-  .admin-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
+      .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
 
-  table {
-    font-size: 13px;
-  }
+      table {
+        font-size: 13px;
+      }
 
-  thead th {
-    padding: 10px 6px;
-    font-size: 13px;
-  }
+      thead th {
+        padding: 10px 6px;
+        font-size: 13px;
+      }
 
-  tbody td {
-    padding: 8px 6px;
-  }
+      tbody td {
+        padding: 8px 6px;
+      }
 
-  .product-image {
-    width: 40px;
-    height: 40px;
-  }
+      .product-image {
+        width: 40px;
+        height: 40px;
+      }
 
-  .theme-toggle-btn {
-    top: 15px;
-    right: 15px;
-    padding: 8px 16px;
-    font-size: 14px;
-  }
+      /* ปรับปุ่มสลับธีมให้เล็กลง ไม่บังหัวเว็บ */
+      .theme-toggle-btn {
+        top: 10px;
+        right: 10px;
+        padding: 6px 10px;
+        font-size: 13px;
+        gap: 4px;
+      }
 
-  .theme-icon {
-    font-size: 16px;
-  }
-}
+      .theme-toggle-btn .theme-text {
+        display: none; /* มือถือโชว์เฉพาะไอคอน จะได้ไม่บังข้อความ */
+      }
 
-/* ตัดชื่อสินค้ายาว ๆ ให้ไม่กินพื้นที่ทั้งจอมือถือ */
-@media (max-width: 600px) {
-  /* คอลัมน์ชื่อสินค้า (คอลัมน์ที่ 3) */
-  td:nth-child(3) {
-    max-width: 140px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* แสดง ... ต่อท้าย */
-  }
-}
+      .theme-icon {
+        font-size: 16px;
+      }
+    }
+
+    /* ตัดชื่อสินค้ายาว ๆ ให้ไม่กินพื้นที่ทั้งจอมือถือ */
+    @media (max-width: 600px) {
+      td:nth-child(3) {
+        max-width: 140px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
 
     /* Dark Mode Styles */
     body.dark-mode {
@@ -1292,7 +1298,7 @@
           </thead>
           <tbody id="adminTableBody">
             <tr>
-              <td colspan="6" style="text-align:center;padding:40px;color:#999;">กำลังโหลดข้อมูล...</td>
+              <td colspan="6" style="text-align:center;padding:40px;color:#999;">ไม่พบข้อมูลสินค้า</td>
             </tr>
           </tbody>
         </table>
@@ -1599,12 +1605,14 @@
       }
     }
 
+    // ปรับขนาด & layout หน้าแก้ไขสินค้าให้พอดีกลางจอ
     window.editProduct = function (index) {
       const product = allProducts[index];
       Swal.fire({
         title: '✏️ แก้ไขสินค้า',
+        width: 'min(480px, 90%)',
         html: `
-          <div style="text-align: left;">
+          <div style="text-align:left; max-width:100%; margin:0 auto;">
             <div class="form-group">
               <label>รหัสสินค้า</label>
               <input id="editSku" class="swal2-input"
@@ -2060,4 +2068,3 @@
   </script>
 </body>
 </html>
-

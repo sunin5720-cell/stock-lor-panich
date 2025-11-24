@@ -5,14 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ระบบสต็อกสินค้า - ⭐ ล้อพาณิชย์ ⭐</title>
 
-  <!-- Canva SDK (ถ้าไม่ได้ใช้กับ Canva แล้ว แต่ไม่เป็นไรก็ปล่อยไว้ได้) -->
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <!-- Tailwind (ไม่จำเป็นมาก แต่ถ้เคยใช้ใน Canva ก็ปล่อยไว้ได้) -->
+  <!-- Tailwind (optional) -->
   <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
 
   <style>
@@ -1330,13 +1326,18 @@
     const ADMIN_PASSWORD = "3333333333*";
 
     // URL Google Apps Script (ตัวอย่าง) — ให้ใช้ URL จริงของคุณ
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzN1MfxYF9kGIC5HYGZ33ZSMfx4oCGoeMjsNoGzZZ2xAzGnXNqTuv0Ab5LsSaKh9tn/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPLbjIxspoK57GD-huaSF6cIHssQzRkDVNBTI9jdGY5f2-SLaTRHYTTwDjoX8NG644/exec";
 
     let allProducts = [];
     let currentFilter = "all";
     let lastUpdated = null;
     const ITEMS_PER_PAGE = 50;
     let currentViewerPage = 1;
+
+    // Placeholder image (กรณี URL ผิดพลาด)
+    const PLACEHOLDER_IMAGE = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect fill="#ffe5f0" width="100%" height="100%"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#ff69b4" font-size="20">No Image</text></svg>`
+    );
 
     // --- Helpers ---
     function escapeHtml(text) {
@@ -1348,22 +1349,56 @@
     function safeProduct(product) {
       const qRaw = product?.quantity;
       const qNum = Number(qRaw);
+      // normalize imageUrl at safeProduct stage so everything downstream works with a consistent URL
+      const rawImage = product?.imageUrl ?? '';
       return {
         sku: product?.sku ?? "",
         name: product?.name ?? "",
         quantity: Number.isFinite(qNum) ? Math.floor(qNum) : 0,
         status: product?.status ?? "",
-        imageUrl: product?.imageUrl ?? ""
+        imageUrl: normalizeImageUrl(rawImage)
       };
     }
 
+    /**
+     * normalizeImageUrl
+     * - รองรับรูปแบบต่าง ๆ ของ Google Drive (/file/d/, open?id=, uc?id=)
+     * - ถ้าเป็น lh3.googleusercontent.com หรือเป็น URL รูปตรง ๆ จะคืนค่าต้นฉบับ
+     * - ถ้าเป็นเฉพาะ ID (ความยาวพอสมควร) จะสร้าง URL drive.google.com/uc?export=view&id=ID
+     */
     function normalizeImageUrl(url) {
-      if (!url || typeof url !== 'string') return url;
-      const drivePattern = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
-      const match = url.match(drivePattern);
-      if (match && match[1]) {
-        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      if (!url || typeof url !== 'string') return '';
+
+      url = url.trim();
+
+      // ถ้าเป็น data URL หรือเป็น URL ของ lh3 หรือเป็น URL ที่ลงท้ายด้วยนามสกุลภาพ ให้คืนค่าต้นฉบับ
+      if (/^data:image\//i.test(url)) return url;
+      if (/^https?:\/\/lh3\.googleusercontent\.com\//i.test(url)) return url;
+      if (/\.(jpe?g|png|gif|webp|svg)(\?|$)/i.test(url)) return url;
+
+      // patterns ต่าง ๆ ที่พบบ่อยของ Google Drive
+      const patterns = [
+        /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]{10,})/,   // /file/d/ID
+        /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]{10,})/,  // open?id=ID
+        /drive\.google\.com\/uc\?id=([a-zA-Z0-9_-]{10,})/,    // uc?id=ID
+        /drive\.google\.com\/.*?id=([a-zA-Z0-9_-]{10,})/,     // any id=...
+        /\/d\/([a-zA-Z0-9_-]{10,})\/view/                    // /d/ID/view
+      ];
+
+      for (const re of patterns) {
+        const m = url.match(re);
+        if (m && m[1]) {
+          return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+        }
       }
+
+      // บางครั้งผู้ใช้ใส่เฉพาะ ID
+      const maybeId = (url.match(/[a-zA-Z0-9_-]{20,}/) || [])[0];
+      if (maybeId) {
+        return `https://drive.google.com/uc?export=view&id=${maybeId}`;
+      }
+
+      // ถ้าไม่รู้จักรูปแบบ ให้คืนค่าเดิม (จะถูกใช้เป็น src โดยถ้าโหลดไม่ได้จะ fallback เป็น placeholder)
       return url;
     }
 
@@ -1443,7 +1478,12 @@
 
       jsonpRequest({ action: 'list' })
         .then(res => {
-          allProducts = (res.data || []).map(p => p);
+          // normalize ทุก imageUrl ที่ได้จากเซิร์ฟเวอร์ก่อนเก็บลง allProducts
+          allProducts = (res.data || []).map(p => {
+            const copy = Object.assign({}, p);
+            copy.imageUrl = normalizeImageUrl(copy.imageUrl || '');
+            return copy;
+          });
           lastUpdated = new Date();
           Swal.close();
           if (typeof callback === 'function') callback();
@@ -1514,13 +1554,17 @@
 
       tbody.innerHTML = pageData.map(product => {
         const safe = safeProduct(product);
-        const imageUrl = normalizeImageUrl(safe.imageUrl);
-        const imgEsc = escapeHtml(imageUrl);
+        const imageUrl = safe.imageUrl || '';
+        // เตรียม img tag แต่ใช้ onerror เพื่อ fallback ไปยัง placeholder
+        const imgEsc = escapeHtml(imageUrl || '');
         return `
           <tr>
             <td>
-              <img src="${imgEsc}" alt="${escapeHtml(safe.name)}"
-                   class="product-image" style="cursor:pointer;" data-image="${imgEsc}">
+              <img src="${imgEsc || PLACEHOLDER_IMAGE}"
+                   alt="${escapeHtml(safe.name)}"
+                   class="product-image" style="cursor:pointer;"
+                   data-image="${imgEsc}"
+                   onerror="this.onerror=null;this.src='${PLACEHOLDER_IMAGE}';">
             </td>
             <td>${escapeHtml(safe.sku)}</td>
             <td>${escapeHtml(safe.name)}</td>
@@ -1560,11 +1604,11 @@
 
       tbody.innerHTML = allProducts.map((product) => {
         const safe = safeProduct(product);
-        const imageUrl = normalizeImageUrl(safe.imageUrl);
+        const imageUrl = safe.imageUrl || '';
         const imgEsc = escapeHtml(imageUrl);
         return `
           <tr>
-            <td><img src="${imgEsc}" alt="${escapeHtml(safe.name)}" class="product-image" style="cursor:pointer;" data-image="${imgEsc}"></td>
+            <td><img src="${imgEsc || PLACEHOLDER_IMAGE}" alt="${escapeHtml(safe.name)}" class="product-image" style="cursor:pointer;" data-image="${imgEsc}" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMAGE}';"></td>
             <td>${escapeHtml(safe.sku)}</td>
             <td>${escapeHtml(safe.name)}</td>
             <td>${escapeHtml(String(safe.quantity))}</td>
@@ -1583,7 +1627,9 @@
     // --- Image modal open (use delegation) ---
     function openImageModal(imageUrl) {
       const img = (imageUrl || '').replace(/&amp;/g, '&');
-      document.getElementById('modalImage').src = img;
+      const modalImg = document.getElementById('modalImage');
+      modalImg.src = img || PLACEHOLDER_IMAGE;
+      modalImg.onerror = function() { this.onerror = null; this.src = PLACEHOLDER_IMAGE; };
       document.getElementById('imageModal').classList.add('active');
     }
 
@@ -1681,12 +1727,12 @@
             Swal.showValidationMessage('จำนวนสินค้าต้องเป็นจำนวนเต็มบวกหรือเท่ากับ 0');
             return false;
           }
-          if (!imageUrl || !imageUrl.startsWith('http')) {
-            Swal.showValidationMessage('ลิงก์รูปต้องเป็น URL ที่ถูกต้อง');
+          if (!imageUrl) {
+            Swal.showValidationMessage('กรุณาระบุลิงก์รูปที่ถูกต้อง');
             return false;
           }
 
-          return { sku: product.sku, name, quantity, status, imageUrl };
+          return { sku: product.sku, name, quantity, status, imageUrl, originalImageUrl: raw };
         }
       }).then((result) => {
         if (result.isConfirmed) {
@@ -1704,6 +1750,7 @@
         didOpen: () => Swal.showLoading()
       });
 
+      // แน่ใจว่า imageUrl ถูก normalize ก่อนส่ง
       const params = {
         action: 'update',
         adminId: ADMIN_ID,
@@ -1712,7 +1759,8 @@
         name: data.name,
         quantity: String(Math.floor(Number(data.quantity))),
         status: data.status,
-        imageUrl: data.imageUrl
+        imageUrl: normalizeImageUrl(data.imageUrl),
+        originalImageUrl: data.originalImageUrl || ''
       };
 
       jsonpRequest(params)
@@ -1803,7 +1851,8 @@
         name: data.name,
         quantity: String(Math.floor(Number(data.quantity))),
         status: data.status,
-        imageUrl: data.imageUrl
+        imageUrl: normalizeImageUrl(data.imageUrl),
+        originalImageUrl: data.imageUrl || ''
       };
 
       jsonpRequest(params).then(res => {
@@ -1862,12 +1911,12 @@
         Swal.fire({ icon: 'error', title: 'ข้อมูลไม่ถูกต้อง', text: 'จำนวนสินค้าต้องเป็นจำนวนเต็มและมากกว่าหรือเท่ากับ 0', confirmButtonColor: '#ff69b4' });
         return;
       }
-      if (!imageUrl || !imageUrl.startsWith('http')) {
+      if (!imageUrl) {
         Swal.fire({ icon: 'error', title: 'ข้อมูลไม่ถูกต้อง', text: 'ลิงก์รูปต้องเป็น URL ที่ถูกต้อง', confirmButtonColor: '#ff69b4' });
         return;
       }
 
-      addProduct({ sku, name, quantity, status, imageUrl });
+      addProduct({ sku, name, quantity, status, imageUrl: raw });
     });
 
     document.getElementById('refreshBtn').addEventListener('click', function () {
@@ -1906,29 +1955,6 @@
         this.classList.remove('active');
       }
     });
-
-    // Canva config (ถ้าใช้) — ถ้าไม่มีก็ไม่เป็นไร
-    async function onConfigChange(config) {
-      const pageTitle = config.page_title || defaultConfig.page_title;
-      const shopName = config.shop_name || defaultConfig.shop_name;
-
-      const pageTitleEl = document.getElementById('pageTitle');
-      const shopNameEl = document.getElementById('shopName');
-      const adminPageTitleEl = document.getElementById('adminPageTitle');
-      const adminShopNameEl = document.getElementById('adminShopName');
-
-      if (pageTitleEl) pageTitleEl.textContent = pageTitle;
-      if (shopNameEl) shopNameEl.innerHTML = '⭐ ' + shopName + ' ⭐';
-      if (adminPageTitleEl) adminPageTitleEl.textContent = pageTitle;
-      if (adminShopNameEl) adminShopNameEl.innerHTML = '⭐ ' + shopName + ' ⭐';
-    }
-
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig: defaultConfig,
-        onConfigChange: onConfigChange,
-      });
-    }
 
     // --- Dark Mode (เหมือนเดิม) ---
     function updateThemeToggleButtons(isDark) {

@@ -5,22 +5,1118 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ระบบสต็อกสินค้า - ⭐ ล้อพาณิชย์ ⭐</title>
 
+  <!-- Canva SDK (ถ้าไม่ได้ใช้กับ Canva แล้ว แต่ไม่เป็นไรก็ปล่อยไว้ได้) -->
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <!-- Tailwind (อาจมี/ไม่มีก็ได้) -->
+  <!-- Tailwind (ไม่จำเป็นมาก แต่ถ้เคยใช้ใน Canva ก็ปล่อยไว้ได้) -->
   <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
 
   <style>
-    /* (ตัด CSS ยาว ๆ ออกเพื่อความกระชับ — ในไฟล์จริงให้วาง CSS ของคุณเข้าไปเหมือนเดิม) */
-    /* ใช้ CSS เดิมทั้งหมดจากต้นฉบับของคุณ */
-    /* ... (วาง CSS เดิมทั้งหมดที่มีในต้นฉบับ) ... */
-    /* ---------- */
-    /* เพื่อความสั้นที่นี่สมมติว่ายังคง CSS ทุกอย่างเดิมตามต้นฉบับ */
+    /* ---------- เริ่ม CSS ที่ครบเหมือนต้นฉบับ ---------- */
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Sarabun', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #ffc3e1 0%, #ffe5f0 100%);
+      min-height: 100%;
+      height: 100%;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    @keyframes fadeInSlideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes modalImageZoom {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 20%),
+        linear-gradient(135deg, #ff69b4 0%, #ff1493 30%, #c71585 60%, #ff1493 80%, #ff69b4 100%);
+      border-radius: 25px;
+      padding: 45px 30px 40px 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 35px rgba(255, 105, 180, 0.5), 0 2px 15px rgba(255, 255, 255, 0.2) inset;
+      text-align: center;
+      animation: fadeInSlideUp 0.6s ease-out;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      width: 50px;
+      height: 50px;
+      opacity: 0.15;
+      animation: fadeInSlideDown 1.2s ease-out;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      opacity: 0.15;
+      animation: fadeInSlideDown 1.4s ease-out;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    .header h1 {
+      margin: 0 0 15px 0;
+      color: white;
+      font-size: 36px;
+      font-weight: 700;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 4px 15px rgba(255, 255, 255, 0.3);
+      animation: fadeInSlideDown 0.8s ease-out;
+      font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+    }
+
+    .shop-badge {
+      display: inline-block;
+      margin: 0 0 20px 0;
+      padding: 12px 35px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%);
+      backdrop-filter: blur(15px);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 50px;
+      color: #ffd700;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(255, 255, 255, 0.3) inset;
+      animation: fadeInSlideDown 1s ease-out;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+    }
+
+    .controls-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(255, 105, 180, 0.15);
+      animation: fadeInSlideUp 0.8s ease-out;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .controls-card:hover {
+      box-shadow: 0 8px 30px rgba(255, 105, 180, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .search-filter-row {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 300px;
+      max-width: 600px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 14px 20px;
+      border: 2px solid #ffc3e1;
+      border-radius: 15px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+      border-color: #ff69b4;
+      box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .search-box input:hover {
+      border-color: #ff69b4;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 14px 25px;
+      border: 2px solid #ffc3e1;
+      border-radius: 15px;
+      background: white;
+      color: #ff69b4;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.3s;
+      min-width: 220px;
+    }
+
+    .filter-select:hover {
+      background: #fff0f7;
+      border-color: #ff69b4;
+    }
+
+    .filter-select:focus {
+      border-color: #ff69b4;
+      box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+    }
+
+    .admin-btn {
+      padding: 14px 40px;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 30px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%);
+      backdrop-filter: blur(15px);
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(255, 255, 255, 0.3) inset;
+      display: inline-block;
+      position: relative;
+      overflow: hidden;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .admin-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .admin-btn:hover::before {
+      left: 100%;
+    }
+
+    .admin-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.25) 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(255, 255, 255, 0.4) inset;
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .admin-btn:active {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .header-subtitle {
+      margin: 15px 0 0 0;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      animation: fadeInSlideDown 1.2s ease-out;
+    }
+
+    .table-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(255, 105, 180, 0.15);
+      overflow-x: auto;
+      animation: fadeInSlideUp 1s ease-out;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .table-card:hover {
+      box-shadow: 0 8px 30px rgba(255, 105, 180, 0.25);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: #ff1493;
+      color: white;
+      padding: 15px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 16px;
+      white-space: nowrap;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    thead th:first-child {
+      border-top-left-radius: 12px;
+    }
+
+    thead th:last-child {
+      border-top-right-radius: 12px;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #ffe5f0;
+      transition: background 0.25s ease, transform 0.2s ease;
+      animation: fadeInSlideUp 0.4s ease-out backwards;
+    }
+
+    tbody tr:nth-child(1) { animation-delay: 0.05s; }
+    tbody tr:nth-child(2) { animation-delay: 0.1s; }
+    tbody tr:nth-child(3) { animation-delay: 0.15s; }
+    tbody tr:nth-child(4) { animation-delay: 0.2s; }
+    tbody tr:nth-child(5) { animation-delay: 0.25s; }
+    tbody tr:nth-child(n+6) { animation-delay: 0.3s; }
+
+    tbody tr:hover {
+      background: #fff5fa;
+      transform: translateY(-1px);
+    }
+
+    tbody td {
+      padding: 15px;
+      color: #333;
+      font-size: 15px;
+    }
+
+    .product-image {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      border: 2px solid #ffe5f0;
+    }
+
+    .product-image:hover {
+      transform: scale(1.12);
+      box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+      border-color: #ff69b4;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .status-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
+    }
+
+    .status-ready {
+      background: linear-gradient(135deg, #b3e5fc 0%, #c8e6c9 100%);
+      color: #1b5e20;
+    }
+
+    .status-out {
+      background: linear-gradient(135deg, #e1bee7 0%, #f8bbd0 100%);
+      color: #6a1b9a;
+    }
+
+    .status-warehouse {
+      background: linear-gradient(135deg, #fff9c4 0%, #ffccbc 100%);
+      color: #e65100;
+    }
+
+    .status-shipping {
+      background: linear-gradient(135deg, #b3e5fc 0%, #d1c4e9 100%);
+      color: #4527a0;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+      animation: modalFadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 90%;
+      max-height: 90%;
+      text-align: center;
+      animation: modalImageZoom 0.4s ease-out;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      max-height: 70%;
+      border-radius: 15px;
+    }
+
+    .modal-close {
+      margin-top: 20px;
+      padding: 10px 30px;
+      border: none;
+      border-radius: 15px;
+      background: #ff69b4;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .modal-close:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+    }
+
+    .modal-close:active {
+      transform: scale(0.97);
+    }
+
+    .login-container {
+      display: none;
+      min-height: 100%;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: modalFadeIn 0.4s ease-out;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 4px 30px rgba(255, 105, 180, 0.2);
+      max-width: 450px;
+      width: 100%;
+      animation: modalImageZoom 0.5s ease-out;
+    }
+
+    .login-card h2 {
+      color: #ff69b4;
+      margin: 0 0 30px 0;
+      text-align: center;
+      font-size: 28px;
+      animation: fadeInSlideDown 0.6s ease-out;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #ff69b4;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #ffc3e1;
+      border-radius: 15px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #ff69b4;
+      box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .form-group select {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #ffc3e1;
+      border-radius: 15px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+      background: white;
+      cursor: pointer;
+    }
+
+    .form-group select:focus {
+      border-color: #ff69b4;
+      box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .form-group select:hover {
+      border-color: #ff69b4;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+      margin-top: 10px;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5);
+    }
+
+    .login-btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 3px 10px rgba(255, 105, 180, 0.3);
+    }
+
+    .back-btn {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ff69b4;
+      border-radius: 15px;
+      background: white;
+      color: #ff69b4;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-top: 15px;
+    }
+
+    .back-btn:hover {
+      background: #fff0f7;
+      transform: scale(1.02);
+      box-shadow: 0 2px 10px rgba(255, 105, 180, 0.2);
+    }
+
+    .back-btn:active {
+      transform: scale(0.98);
+    }
+
+    .admin-container {
+      display: none;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .logout-btn {
+      padding: 10px 25px;
+      border: 2px solid #ff69b4;
+      border-radius: 15px;
+      background: white;
+      color: #ff69b4;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .logout-btn:hover {
+      background: #fff0f7;
+      transform: scale(1.04);
+      box-shadow: 0 2px 10px rgba(255, 105, 180, 0.2);
+    }
+
+    .logout-btn:active {
+      transform: scale(0.97);
+    }
+
+    .form-card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(255, 105, 180, 0.15);
+      animation: fadeInSlideUp 0.9s ease-out;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .form-card:hover {
+      box-shadow: 0 8px 30px rgba(255, 105, 180, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .form-card h3 {
+      color: #ff69b4;
+      margin: 0 0 25px 0;
+      font-size: 22px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .submit-btn {
+      padding: 14px 40px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, #ff1493 0%, #c71585 100%);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 20px rgba(255, 105, 180, 0.6);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 3px 10px rgba(255, 105, 180, 0.3);
+    }
+
+    .action-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-right: 8px;
+    }
+
+    .edit-btn {
+      background: linear-gradient(135deg, #ffb3d9 0%, #ffc3e1 100%);
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .edit-btn:hover {
+      background: linear-gradient(135deg, #ff99cc 0%, #ffaad5 100%);
+      transform: scale(1.08);
+      box-shadow: 0 3px 12px rgba(255, 105, 180, 0.4);
+    }
+
+    .edit-btn:active {
+      transform: scale(0.95);
+    }
+
+    .delete-btn {
+      background: linear-gradient(135deg, #c71585 0%, #d946a6 100%);
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .delete-btn:hover {
+      background: linear-gradient(135deg, #a0116b 0%, #c71585 100%);
+      transform: scale(1.08);
+      box-shadow: 0 3px 12px rgba(199, 21, 133, 0.5);
+    }
+
+    .delete-btn:active {
+      transform: scale(0.95);
+    }
+
+    .refresh-btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #d946a6 0%, #ba68c8 100%);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(217, 70, 166, 0.4);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .refresh-btn:hover {
+      background: linear-gradient(135deg, #c71585 0%, #ab47bc 100%);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 20px rgba(217, 70, 166, 0.6);
+    }
+
+    .refresh-btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 3px 10px rgba(217, 70, 166, 0.3);
+    }
+
+    .last-updated {
+      text-align: center;
+      margin: 20px auto 0 auto;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #fff0f7 0%, #ffe5f0 100%);
+      border-radius: 16px;
+      color: #ff69b4;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+      box-shadow: 0 2px 8px rgba(255, 105, 180, 0.12);
+      display: table;
+    }
+
+    .swal2-popup {
+      border-radius: 20px;
+      padding: 24px 20px;
+    }
+
+    .swal2-confirm {
+      border-radius: 15px;
+      background: #ff69b4 !important;
+    }
+
+    .swal2-cancel {
+      border-radius: 15px;
+    }
+
+    .theme-toggle-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      border-radius: 25px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+      backdrop-filter: blur(10px);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .theme-toggle-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.2) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      border-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .theme-toggle-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .theme-icon {
+      font-size: 18px;
+      display: inline-block;
+    }
+
+    .theme-text {
+      font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+    }
+
+    /* ปรับเลย์เอาต์สำหรับมือถือ */
+    @media (max-width: 768px) {
+      .container {
+        max-width: 100%;
+        padding: 10px;
+      }
+
+      .header {
+        padding: 30px 18px 24px 18px;
+        margin-bottom: 15px;
+        border-radius: 20px;
+      }
+
+      .header h1 {
+        font-size: 22px;
+      }
+
+      .shop-badge {
+        font-size: 20px;
+        padding: 8px 20px;
+        letter-spacing: 2px;
+      }
+
+      .header-subtitle {
+        font-size: 12px;
+      }
+
+      .admin-btn {
+        width: 100%;
+        max-width: 260px;
+        margin-top: 10px;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .controls-card,
+      .table-card,
+      .form-card,
+      .login-card {
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      .search-filter-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .search-box {
+        min-width: 100%;
+      }
+
+      .filter-select {
+        min-width: 100%;
+      }
+
+      .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      thead th {
+        padding: 10px 6px;
+        font-size: 13px;
+      }
+
+      tbody td {
+        padding: 8px 6px;
+      }
+
+      .product-image {
+        width: 40px;
+        height: 40px;
+      }
+
+      /* ปรับปุ่มสลับธีมให้เล็กลง ไม่บังหัวเว็บ */
+      .theme-toggle-btn {
+        top: 10px;
+        right: 10px;
+        padding: 6px 10px;
+        font-size: 13px;
+        gap: 4px;
+      }
+
+      .theme-toggle-btn .theme-text {
+        display: none; /* มือถือโชว์เฉพาะไอคอน จะได้ไม่บังข้อความ */
+      }
+
+      .theme-icon {
+        font-size: 16px;
+      }
+    }
+
+    /* ตัดชื่อสินค้ายาว ๆ ให้ไม่กินพื้นที่ทั้งจอมือถือ */
+    @media (max-width: 600px) {
+      td:nth-child(3) {
+        max-width: 140px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 100%);
+    }
+
+    body.dark-mode .header {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 20%),
+        linear-gradient(135deg, #4a148c 0%, #6a1b9a 30%, #7b1fa2 60%, #6a1b9a 80%, #4a148c 100%);
+      box-shadow: 0 8px 35px rgba(106, 27, 154, 0.6), 0 2px 15px rgba(255, 255, 255, 0.1) inset;
+    }
+
+    body.dark-mode .shop-badge {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+      border: 2px solid rgba(255, 215, 0, 0.6);
+      color: #ffd700;
+    }
+
+    body.dark-mode .header-subtitle {
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    body.dark-mode .controls-card,
+    body.dark-mode .table-card,
+    body.dark-mode .form-card,
+    body.dark-mode .login-card {
+      background: #2a2a3e;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark-mode .controls-card:hover,
+    body.dark-mode .table-card:hover,
+    body.dark-mode .form-card:hover {
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    body.dark-mode .search-box input,
+    body.dark-mode .filter-select,
+    body.dark-mode .form-group input,
+    body.dark-mode .form-group select {
+      background: #1a1a2e;
+      border: 2px solid #6a1b9a;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .search-box input::placeholder {
+      color: #888;
+    }
+
+    body.dark-mode .search-box input:focus,
+    body.dark-mode .filter-select:focus,
+    body.dark-mode .form-group input:focus,
+    body.dark-mode .form-group select:focus {
+      border-color: #ab47bc;
+      box-shadow: 0 0 0 4px rgba(171, 71, 188, 0.3);
+    }
+
+    body.dark-mode .search-box input:hover,
+    body.dark-mode .filter-select:hover,
+    body.dark-mode .form-group input:hover,
+    body.dark-mode .form-group select:hover {
+      border-color: #ab47bc;
+    }
+
+    body.dark-mode thead th {
+      background: #6a1b9a;
+      color: white;
+    }
+
+    body.dark-mode tbody tr {
+      border-bottom: 1px solid #3a3a4e;
+    }
+
+    body.dark-mode tbody tr:hover {
+      background: #3a3a4e;
+    }
+
+    body.dark-mode tbody td {
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .product-image {
+      border: 2px solid #6a1b9a;
+    }
+
+    body.dark-mode .product-image:hover {
+      border-color: #ab47bc;
+      box-shadow: 0 4px 15px rgba(171, 71, 188, 0.5);
+    }
+
+    body.dark-mode .last-updated {
+      background: linear-gradient(135deg, #3a3a4e 0%, #2a2a3e 100%);
+      color: #ab47bc;
+    }
+
+    body.dark-mode .form-card h3,
+    body.dark-mode .controls-card h3,
+    body.dark-mode .login-card h2 {
+      color: #ce93d8;
+    }
+
+    body.dark-mode .form-group label {
+      color: #ce93d8;
+    }
+
+    body.dark-mode .modal {
+      background: rgba(0, 0, 0, 0.85);
+    }
+
+    body.dark-mode .modal-content {
+      background: #2a2a3e;
+    }
+
+    body.dark-mode .modal-close {
+      background: #6a1b9a;
+    }
+
+    body.dark-mode .modal-close:hover {
+      box-shadow: 0 4px 15px rgba(106, 27, 154, 0.6);
+    }
+
+    body.dark-mode #viewerPagination {
+      border-top: 2px solid #3a3a4e;
+    }
+
+    body.dark-mode #pageInfo {
+      color: #ce93d8;
+    }
+
+    body.dark-mode .status-ready {
+      background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+      color: #c8e6c9;
+    }
+
+    body.dark-mode .status-out {
+      background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
+      color: #e1bee7;
+    }
+
+    body.dark-mode .status-warehouse {
+      background: linear-gradient(135deg, #e65100 0%, #f57c00 100%);
+      color: #ffe0b2;
+    }
+
+    body.dark-mode .status-shipping {
+      background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+      color: #bbdefb;
+    }
+
+    body.dark-mode .swal2-popup {
+      background: #2a2a3e;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .swal2-title {
+      color: #ce93d8;
+    }
+
+    body.dark-mode .swal2-html-container {
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .swal2-input,
+    body.dark-mode .swal2-select {
+      background: #1a1a2e;
+      border: 1px solid #6a1b9a;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .swal2-input:focus,
+    body.dark-mode .swal2-select:focus {
+      border-color: #ab47bc;
+      box-shadow: 0 0 0 3px rgba(171, 71, 188, 0.3);
+    }
+
+    body.dark-mode .swal2-confirm {
+      background: #6a1b9a !important;
+    }
+
+    body.dark-mode .swal2-cancel {
+      background: #424242;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .swal2-validation-message {
+      background: #d32f2f;
+      color: white;
+    }
+    /* ---------- จบ CSS ---------- */
+  </style>
+
+  <style>
+    @view-transition {
+      navigation: auto;
+    }
   </style>
 </head>
 <body>
-  <!-- (HTML โครงสร้างทั้งหมดเหมือนเดิม — ผมเก็บไว้ครบถ้วน) -->
   <!-- Viewer Section -->
   <div id="viewerSection">
     <div class="container">
@@ -118,7 +1214,7 @@
   </div>
 
   <!-- Admin Section -->
-  <div class="admin-container" id="adminSection" style="display:none;">
+  <div class="admin-container" id="adminSection">
     <div class="container">
       <div class="header">
         <button class="theme-toggle-btn" id="themeToggleAdmin" aria-label="Toggle Dark Mode">
@@ -250,13 +1346,11 @@
     }
 
     function safeProduct(product) {
-      // แปลง quantity เป็นตัวเลขเสมอ (integer) เพื่อหลีกเลี่ยง bug ตอนแก้จำนวน
       const qRaw = product?.quantity;
       const qNum = Number(qRaw);
       return {
         sku: product?.sku ?? "",
         name: product?.name ?? "",
-        // หาก qRaw ไม่ใช่ตัวเลข จะได้ 0
         quantity: Number.isFinite(qNum) ? Math.floor(qNum) : 0,
         status: product?.status ?? "",
         imageUrl: product?.imageUrl ?? ""
@@ -268,7 +1362,6 @@
       const drivePattern = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
       const match = url.match(drivePattern);
       if (match && match[1]) {
-        // สร้าง direct link สำหรับแสดงรูป (UC format) — ปลอดภัยกว่าการใช้ lh3 แบบเดิม
         return `https://drive.google.com/uc?export=view&id=${match[1]}`;
       }
       return url;
@@ -350,10 +1443,7 @@
 
       jsonpRequest({ action: 'list' })
         .then(res => {
-          allProducts = (res.data || []).map(p => {
-            // เก็บ raw object แต่ให้แน่ใจว่า quantity เป็นตัวเลขใน safeProduct
-            return p;
-          });
+          allProducts = (res.data || []).map(p => p);
           lastUpdated = new Date();
           Swal.close();
           if (typeof callback === 'function') callback();
@@ -472,7 +1562,6 @@
         const safe = safeProduct(product);
         const imageUrl = normalizeImageUrl(safe.imageUrl);
         const imgEsc = escapeHtml(imageUrl);
-        // ปุ่มจะมี data-sku เพื่อให้ event delegation จัดการ
         return `
           <tr>
             <td><img src="${imgEsc}" alt="${escapeHtml(safe.name)}" class="product-image" style="cursor:pointer;" data-image="${imgEsc}"></td>
@@ -491,7 +1580,7 @@
       updateLastUpdatedText();
     }
 
-    // --- Image modal open (ใช้ delegation ที่เดียวกัน) ---
+    // --- Image modal open (use delegation) ---
     function openImageModal(imageUrl) {
       const img = (imageUrl || '').replace(/&amp;/g, '&');
       document.getElementById('modalImage').src = img;
@@ -531,7 +1620,7 @@
       }
     }
 
-    // --- Edit product flow (โดยใช้ sku เป็นตัวระบุ) ---
+    // --- Edit product flow (by sku) ---
     function openEditModalForSku(sku) {
       const idx = allProducts.findIndex(p => String(p.sku) === String(sku));
       if (idx === -1) {
@@ -547,7 +1636,7 @@
           <div style="text-align:left; max-width:100%; margin:0 auto;">
             <div class="form-group">
               <label>รหัสสินค้า</label>
-              <input id="editSku" class="swal2-input" value="${escapeHtml(product.sku)}" readonly style="background:#f5f5f5;">
+              <input id="editSku" class="swal2-input" value="${escapeHtml(product.sku)}" readonly style="background:#f5f5f4;">
             </div>
             <div class="form-group">
               <label>ชื่อสินค้า</label>
@@ -606,7 +1695,7 @@
       });
     }
 
-    // --- Update product (ส่ง quantity เป็นตัวเลขแน่นอน) ---
+    // --- Update product ---
     function updateProduct(data) {
       Swal.fire({
         title: 'กำลังอัปเดต',
@@ -621,7 +1710,6 @@
         adminPassword: ADMIN_PASSWORD,
         sku: data.sku,
         name: data.name,
-        // ส่งเป็น integer ชัดเจน
         quantity: String(Math.floor(Number(data.quantity))),
         status: data.status,
         imageUrl: data.imageUrl
@@ -631,7 +1719,6 @@
         .then(res => {
           Swal.close();
           Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'อัปเดตสินค้าเรียบร้อยแล้ว', confirmButtonColor: '#ff69b4' });
-          // โหลดรายการใหม่และแสดง admin
           loadProducts(renderAdminTable);
         })
         .catch(err => {
@@ -640,7 +1727,7 @@
         });
     }
 
-    // --- Delete product (ใช้ SKU เป็นตัวระบุ) ---
+    // --- Delete product (by sku) ---
     function deleteProductBySku(sku) {
       Swal.fire({
         title: 'ยืนยันการลบ',
@@ -672,7 +1759,7 @@
       });
     }
 
-    // --- Event delegation for admin table (แก้ไข / ลบ / เปิดรูป) ---
+    // --- Event delegation for admin table (edit / delete / open image) ---
     function attachAdminTableHandlers() {
       const adminTbody = document.getElementById('adminTableBody');
       if (!adminTbody) return;
@@ -690,14 +1777,12 @@
           return;
         }
 
-        // ถ้าคลิกที่รูปในตาราง (ทั้ง admin & viewer) ให้เปิด modal
         const img = ev.target.closest('.product-image');
         if (img && img.dataset && img.dataset.image) {
           openImageModal(img.dataset.image);
         }
       });
 
-      // viewer table image click (delegation)
       document.getElementById('viewerTableBody')?.addEventListener('click', function(ev) {
         const img = ev.target.closest('.product-image');
         if (img && img.dataset && img.dataset.image) {
@@ -706,7 +1791,7 @@
       });
     }
 
-    // --- Add product (admin) ---
+    // --- Add product ---
     function addProduct(data) {
       Swal.fire({ title: 'กำลังเพิ่มสินค้า', text: 'กรุณารอสักครู่...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
@@ -733,7 +1818,7 @@
       });
     }
 
-    // --- Event Listeners (หน้า UI) ---
+    // --- Event Listeners ---
     document.getElementById('goToAdminBtn').addEventListener('click', showLogin);
     document.getElementById('backToViewerBtn').addEventListener('click', showViewer);
 
@@ -822,7 +1907,7 @@
       }
     });
 
-    // --- Canva config (ถ้าใช้) ---
+    // Canva config (ถ้าใช้) — ถ้าไม่มีก็ไม่เป็นไร
     async function onConfigChange(config) {
       const pageTitle = config.page_title || defaultConfig.page_title;
       const shopName = config.shop_name || defaultConfig.shop_name;
@@ -875,7 +1960,7 @@
     document.getElementById('themeToggleViewer')?.addEventListener('click', toggleDarkMode);
     document.getElementById('themeToggleAdmin')?.addEventListener('click', toggleDarkMode);
 
-    // --- Init แล้วแสดงหน้าแรก ---
+    // --- Init ---
     attachAdminTableHandlers();
 
     if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {

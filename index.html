@@ -962,6 +962,10 @@
           <option value="อยู่โกดังไทย">📦 อยู่โกดังไทย</option>
           <option value="อยู่ระหว่างจัดส่ง">🚚 อยู่ระหว่างจัดส่ง</option>
         </select>
+        <!-- เพิ่มตัวเลือกหมวดหมู่หน้า Viewer -->
+        <select class="filter-select" id="categoryFilterSelect">
+          <option value="all">📦 ทุกหมวดหมู่</option>
+        </select>
       </div>
      </div>
     </div>
@@ -1236,6 +1240,8 @@
           allProducts = response.data || [];
           lastUpdated = new Date();
           if (callback) callback();
+          // อัปเดตหมวดหมู่หลังโหลดข้อมูล
+          populateCategoryFilter();
         } else {
           Swal.fire({
             icon: 'error',
@@ -1288,14 +1294,43 @@
       }
     }
 
+    // เติม dropdown หมวดหมู่จากข้อมูลสินค้า
+    function populateCategoryFilter() {
+      const select = document.getElementById("categoryFilterSelect");
+      if (!select) return;
+
+      const categories = [...new Set(
+        (allProducts || [])
+          .map(p => (p.category || "").trim())
+          .filter(c => c !== "")
+      )];
+
+      select.innerHTML = `<option value="all">📦 ทุกหมวดหมู่</option>`;
+
+      categories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = "📂 " + cat;
+        select.appendChild(option);
+      });
+    }
+
     function filterAndRenderViewer() {
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const categoryFilter = document.getElementById('categoryFilterSelect')?.value || 'all';
       let filtered = allProducts;
 
       if (currentFilter !== 'all') {
         filtered = filtered.filter(p => {
           const safe = safeProduct(p);
           return safe.status === currentFilter;
+        });
+      }
+
+      if (categoryFilter !== 'all') {
+        filtered = filtered.filter(p => {
+          const safe = safeProduct(p);
+          return (safe.category || "") === categoryFilter;
         });
       }
 
@@ -1419,6 +1454,7 @@
     }
 
     function showViewer() {
+      forceUpdateTheme();
       document.getElementById('viewerSection').style.display = 'block';
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('adminSection').style.display = 'none';
@@ -1426,12 +1462,14 @@
     }
 
     function showLogin() {
+      forceUpdateTheme();
       document.getElementById('viewerSection').style.display = 'none';
       document.getElementById('loginSection').style.display = 'flex';
       document.getElementById('adminSection').style.display = 'none';
     }
 
     function showAdmin() {
+      forceUpdateTheme();
       document.getElementById('viewerSection').style.display = 'none';
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('adminSection').style.display = 'block';
@@ -1889,6 +1927,23 @@
       }
     }
 
+    // บังคับให้ธีมตรงกับค่าที่บันทึกไว้เสมอ (ใช้ใน showViewer / showAdmin / showLogin)
+    function forceUpdateTheme() {
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored === 'dark' || stored === 'light') {
+        setTheme(stored);
+      }
+    }
+
+    // ตรวจ session เวลาโหลดหน้า
+    function checkAdminSession() {
+      if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+        showAdmin();
+      } else {
+        showViewer();
+      }
+    }
+
     async function onConfigChange(config) {
       const pageTitle = config.page_title || defaultConfig.page_title;
       const shopName = config.shop_name || defaultConfig.shop_name;
@@ -1904,7 +1959,9 @@
         shopNameEl.innerHTML = '⭐ ' + shopName + ' ⭐';
       }
       
-      if (adminPageTitleEl) adminPageTitleEl.textContent = pageTitle;
+      if (adminPageTitleEl) {
+        adminPageTitleEl.textContent = pageTitle;
+      }
       
       if (adminShopNameEl) {
         adminShopNameEl.innerHTML = '⭐ ' + shopName + ' ⭐';
@@ -1920,7 +1977,7 @@
           borderables: [],
           fontEditable: undefined,
           fontSizeable: undefined
-        })),
+        }),
         mapToEditPanelValues: (config) => new Map([
           ["page_title", config.page_title || defaultConfig.page_title],
           ["shop_name", config.shop_name || defaultConfig.shop_name]
@@ -2095,6 +2152,14 @@
       filterAndRenderViewer();
     });
 
+    const categoryFilterSelect = document.getElementById('categoryFilterSelect');
+    if (categoryFilterSelect) {
+      categoryFilterSelect.addEventListener('change', function() {
+        currentViewerPage = 1;
+        filterAndRenderViewer();
+      });
+    }
+
     document.getElementById('prevPageBtn').addEventListener('click', function() {
       if (currentViewerPage > 1) {
         currentViewerPage--;
@@ -2152,11 +2217,8 @@
 
     updateThemeToggleLabel();
 
-    if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
-      showAdmin();
-    } else {
-      showViewer();
-    }
+    // ใช้ checkAdminSession แทน if เดิม
+    checkAdminSession();
   </script>
   <script>
   (function(){

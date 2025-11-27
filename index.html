@@ -982,10 +982,10 @@
        </tr>
       </thead>
       <tbody id="viewerTableBody">
-       <tr>
-        <td colspan="5" style="text-align: center; padding: 40px; color: #999;">กำลังโหลดข้อมูล...</td>
-       </tr>
-      </tbody>
+  <tr>
+    <td colspan="6" style="text-align: center; padding: 40px; color: #999;">กำลังโหลดข้อมูล...</td>
+  </tr>
+</tbody>
      </table>
      <div id="viewerPagination" style="display: none; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #ffe5f0;">
       <button id="prevPageBtn" class="action-btn edit-btn" style="margin: 0;">◀ ก่อนหน้า</button>
@@ -1354,7 +1354,7 @@
 
       const tbody = document.getElementById('viewerTableBody');
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #999;">ไม่พบข้อมูลสินค้า</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">ไม่พบข้อมูลสินค้า</td></tr>';
         updatePaginationControls(0, 0);
         updateLastUpdatedText();
         return;
@@ -1364,17 +1364,18 @@
         const safe = safeProduct(product);
         const imageUrl = normalizeImageUrl(safe.imageUrl);
         return `
-        <tr>
-          <td>
-            <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(safe.name)}" 
-                 class="product-image" onclick="openImageModal('${escapeHtml(imageUrl)}')">
-          </td>
-          <td>${escapeHtml(safe.sku)}</td>
-          <td>${escapeHtml(safe.name)}</td>
-          <td>${escapeHtml(safe.quantity.toString())}</td>
-          <td>${getStatusBadge(safe.status)}</td>
-        </tr>
-      `;
+  <tr>
+    <td>
+      <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(safe.name)}" 
+           class="product-image" onclick="openImageModal('${escapeHtml(imageUrl)}')">
+    </td>
+    <td>${escapeHtml(safe.sku)}</td>
+    <td>${escapeHtml(safe.name)}</td>
+    <td>${formatCurrency(safe.cost)}</td>
+    <td>${escapeHtml(safe.quantity.toString())}</td>
+    <td>${getStatusBadge(safe.status)}</td>
+  </tr>
+`;
       }).join('');
 
       updatePaginationControls(currentViewerPage, totalPages);
@@ -2255,4 +2256,5 @@
   </script>
  </body>
 </html>
+
 

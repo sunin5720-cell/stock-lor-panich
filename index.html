@@ -2067,7 +2067,11 @@ border: 1px solid rgba(255,255,255,.16);
  <div id="adminDashboardSheet" class="sheet" role="dialog" aria-modal="true" tabindex="-1"></div>
  <div id="adminOrderSheet" class="sheet" role="dialog" aria-modal="true" tabindex="-1"></div>
  <div id="adminStockSheet" class="sheet" role="dialog" aria-modal="true" tabindex="-1"></div>
-
+ <div id="pendingDeliverySheet"
+      class="sheet"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"></div>
 <!-- 🔹 Main Menu (Side Sheet Right) -->
 <div id="mainMenuSheet" class="side-menu" role="dialog" aria-modal="true" tabindex="-1"></div>
 
@@ -2091,6 +2095,8 @@ const adminLoginSheet = document.getElementById("adminLoginSheet");
 const adminDashboardSheet = document.getElementById("adminDashboardSheet");
 const adminOrderSheet = document.getElementById("adminOrderSheet");
 const adminStockSheet = document.getElementById("adminStockSheet");
+const pendingDeliverySheet =
+  document.getElementById("pendingDeliverySheet"); 
 const mainMenuSheet = document.getElementById("mainMenuSheet");
 const adminProductActionSheet = document.getElementById("adminProductActionSheet");
 const adminProductEditSheet = document.getElementById("adminProductEditSheet");
@@ -2104,6 +2110,7 @@ const ADMIN_SHEETS = Object.freeze({
   dashboard: adminDashboardSheet,
   order: adminOrderSheet,
   stock: adminStockSheet,
+  pendingDelivery: pendingDeliverySheet,
   menu: mainMenuSheet,
   productAction: adminProductActionSheet,
   productEdit: adminProductEditSheet,

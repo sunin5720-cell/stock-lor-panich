@@ -2574,6 +2574,30 @@ const fetchAdminProducts = async () => {
   return json.data;
 };  
 
+async function fetchPendingDeliveries() {
+
+  if (!state.admin?.token) {
+    throw new Error("Missing admin token");
+  }
+
+  const form = new URLSearchParams();
+  form.append("action", "pendingDeliveries");
+  form.append("token", state.admin.token);
+
+  const res = await postFormAction(form);
+
+  if (!res?.success) {
+    throw new Error(
+      res?.error || "Failed to load pending deliveries"
+    );
+  }
+
+  return Array.isArray(res?.data)
+    ? res.data
+    : [];
+} 
+
+ 
 function sortProducts(products) {
   if (!Array.isArray(products)) return [];
 
@@ -5393,25 +5417,169 @@ function openPendingDeliverySheet() {
       </h3>
     </div>
 
-    <div class="card">
-      <div style="font-weight:600;">
-        ยังไม่มีรายการ
-      </div>
-
-      <div
-        style="
-          margin-top:8px;
-          color:rgba(235,235,245,.72);
-          font-size:14px;
-        ">
-        ระบบจะแสดงรายการค้างส่งที่นี่
+    <div id="pendingDeliveryList">
+      <div class="card">
+        <div style="font-weight:600;">
+          กำลังโหลด...
+        </div>
       </div>
     </div>
   `;
 
   openOverlay(pendingDeliverySheet);
+
+ fetchPendingDeliveries()
+   .then(renderPendingDeliveries)
+   .catch(err => {
+     console.error(err);
+
+     const container =
+       document.getElementById(
+         "pendingDeliveryList"
+       );
+
+     if (container) {
+       container.innerHTML = `
+         <div class="card">
+           โหลดข้อมูลไม่สำเร็จ
+         </div>
+       `;
+     }
+   }); 
 } 
 
+function renderPendingDeliveries(list) {
+
+  const container =
+    document.getElementById(
+      "pendingDeliveryList"
+    );
+
+  if (!container) return;
+
+  if (!Array.isArray(list) || !list.length) {
+    container.innerHTML = `
+      <div class="card">
+        <div style="font-weight:600;">
+          ไม่มีรายการค้างส่ง
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map(item => `
+    <div class="card">
+
+      <div style="
+        font-weight:600;
+        margin-bottom:8px;
+      ">
+        📦 ${item.poNumber || "-"}
+      </div>
+
+      <div>
+        ${item.productId || "-"}
+      </div>
+
+      <div style="margin-top:4px;">
+        จำนวน ${Number(item.qty || 0)}
+      </div>
+
+      <div style="
+        margin-top:8px;
+        font-size:12px;
+        opacity:.8;
+      ">
+        ${item.status || "-"}
+      </div>
+
+     ${
+       item.status === "OPEN"
+       ? `
+       <button
+         class="btn"
+         style="
+           margin-top:12px;
+           width:100%;
+         "
+         onclick="
+           markPendingDelivered(
+             '${item.pendingId}'
+           )
+         ">
+         ✅ ส่งครบแล้ว
+       </button>
+       `
+       : ""
+     }      
+
+    </div>
+  `).join("");
+}
+
+async function markPendingDelivered(
+  pendingId
+) {
+
+  if (!state.admin?.token) {
+    throw new Error("Not authenticated");
+  }
+ 
+  if (!pendingId) return;
+
+  const ok = confirm(
+    "ยืนยันว่ารายการนี้ส่งครบแล้ว ?"
+  );
+
+  if (!ok) return;
+
+  try {
+
+    const form =
+      new URLSearchParams();
+
+    form.append(
+      "action",
+      "closePendingDelivery"
+    );
+
+    form.append(
+      "pendingId",
+      pendingId
+    );
+
+    form.append(
+      "token",
+      state.admin.token
+    );
+
+    const result =
+      await postFormAction(form);
+
+    if (!result?.success) {
+      throw new Error(
+        result?.error ||
+        "Close pending failed"
+      );
+    }
+
+    const list =
+      await fetchPendingDeliveries();
+
+    renderPendingDeliveries(list);
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      err.message ||
+      "ปิดรายการไม่สำเร็จ"
+    );
+  }
+}
+ 
 function closePendingDeliverySheet() {
   closeOverlay(pendingDeliverySheet);
 } 

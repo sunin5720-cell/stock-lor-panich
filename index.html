@@ -5286,6 +5286,16 @@ async function createPendingDelivery() {
 
   try {
 
+  if (state.admin.isSubmitting) {
+    return;
+  }
+
+  state.admin.isSubmitting = true;
+
+  showLoading(
+    "กำลังสร้างรายการค้างส่ง..."
+  );  
+
     if (!state.admin?.token) {
       throw new Error("Not authenticated");
     }
@@ -5383,18 +5393,16 @@ async function createPendingDelivery() {
       );
     }
 
-    closeOverlay(
-      createPendingDeliverySheet
-    );
+ showToast(
+   "สร้างรายการค้างส่งเรียบร้อย",
+   "success"
+ );
 
-    const list =
-      await fetchPendingDeliveries();
+ closeOverlay(
+   createPendingDeliverySheet
+ );
 
-    renderPendingDeliveries(list);
-
-    alert(
-      "สร้างรายการค้างส่งเรียบร้อย"
-    );
+ openPendingDeliverySheet();
 
   } catch (err) {
 
@@ -5404,6 +5412,12 @@ async function createPendingDelivery() {
       err.message ||
       "ไม่สามารถสร้างรายการค้างส่งได้"
     );
+} finally {
+
+  state.admin.isSubmitting = false;
+
+  safeHideLoading();
+
   }
 }
  
@@ -5745,7 +5759,7 @@ function renderPendingDeliveries(list) {
   if (!Array.isArray(list) || !list.length) {
     container.innerHTML = `
       <div class="card">
-        <div style="font-weight:600;">
+        <div class="name">
           ไม่มีรายการค้างส่ง
         </div>
       </div>
@@ -5756,35 +5770,52 @@ function renderPendingDeliveries(list) {
   container.innerHTML = list.map(item => `
     <div class="card">
 
-      <div style="
-        font-weight:600;
-        margin-bottom:8px;
-      ">
-        📦 ${item.poNumber || "-"}
+<div class="name">
+        📦 PO: ${item.poNumber || "-"}
       </div>
 
-      <div>
-        ${item.productId || "-"}
-      </div>
+ <div class="stock">
+   สินค้า:
+   ${item.productId || "-"}
+ </div>
 
-      <div style="margin-top:4px;">
+ <div class="stock">
+   วันที่:
+   ${item.createdAt || "-"}
+ </div>
+
+ <div class="stock">
+   ผู้สร้าง:
+   ${item.createdBy || "-"}
+ </div>
+
+      <div class="stock">
         จำนวน ${Number(item.qty || 0)}
       </div>
 
-      <div style="
-        margin-top:8px;
-        font-size:12px;
-        opacity:.8;
-      ">
-        ${item.status || "-"}
+<div class="stock">
+ <span
+   class="
+     status
+     ${
+       item.status === "OPEN"
+       ? "warehouse"
+       : "ready"
+     }
+   ">
+   ${
+     item.status === "OPEN"
+     ? "OPEN"
+     : "CLOSED"
+   }
+ </span>
       </div>
 
      ${
        item.status === "OPEN"
        ? `
  <button
-   id="savePendingDeliveryBtn"
-   class="btn"
+   class="btn btn-secondary"
          style="
            margin-top:12px;
            width:100%;

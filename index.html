@@ -5222,7 +5222,7 @@ createPendingDeliverySheet.innerHTML = `
           id="pendingQtyInput"
           type="number"
           min="1"
-          max="${maxQty}"
+          max="${Number(maxQty) || 0}"
           value="1"
           class="input"
         />
@@ -5244,6 +5244,7 @@ createPendingDeliverySheet.innerHTML = `
       </div>
 
       <button
+        onclick="createPendingDelivery()"
         class="btn"
         style="
           margin-top:16px;
@@ -5258,6 +5259,131 @@ createPendingDeliverySheet.innerHTML = `
   openOverlay(
     createPendingDeliverySheet
   );
+}
+
+async function createPendingDelivery() {
+
+  try {
+
+    if (!state.admin?.token) {
+      throw new Error("Not authenticated");
+    }
+
+    const orderId =
+      createPendingDeliverySheet.dataset.orderId;
+
+    const poNumber =
+      createPendingDeliverySheet.dataset.poNumber;
+
+    const productId =
+      createPendingDeliverySheet.dataset.productId;
+
+    const qty = Number(
+      document.getElementById(
+        "pendingQtyInput"
+      )?.value || 0
+    );
+
+    const note =
+      document.getElementById(
+        "pendingNoteInput"
+      )?.value?.trim() || "";
+
+    if (!orderId) {
+      throw new Error("Missing orderId");
+    }
+
+    if (!productId) {
+      throw new Error("Missing productId");
+    }
+
+    if (qty <= 0) {
+      throw new Error(
+        "จำนวนค้างส่งต้องมากกว่า 0"
+      );
+    }
+
+ const maxQty = Number(
+   document.getElementById(
+     "pendingQtyInput"
+   )?.max || 0
+ );
+
+ if (qty > maxQty) {
+   throw new Error(
+     "จำนวนค้างส่งเกินจำนวนใน PO"
+   );
+ }
+   
+    const form = new URLSearchParams();
+
+    form.append(
+      "action",
+      "createPendingDelivery"
+    );
+
+    form.append(
+      "token",
+      state.admin.token
+    );
+
+    form.append(
+      "orderId",
+      orderId
+    );
+
+    form.append(
+      "poNumber",
+      poNumber || ""
+    );
+
+    form.append(
+      "productId",
+      productId
+    );
+
+    form.append(
+      "qty",
+      qty
+    );
+
+    form.append(
+      "note",
+      note
+    );
+
+    const result =
+      await postFormAction(form);
+
+    if (!result?.success) {
+      throw new Error(
+        result?.error ||
+        "Create pending delivery failed"
+      );
+    }
+
+    closeOverlay(
+      createPendingDeliverySheet
+    );
+
+    const list =
+      await fetchPendingDeliveries();
+
+    renderPendingDeliveries(list);
+
+    alert(
+      "สร้างรายการค้างส่งเรียบร้อย"
+    );
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      err.message ||
+      "ไม่สามารถสร้างรายการค้างส่งได้"
+    );
+  }
 }
  
 async function handleApprove() {

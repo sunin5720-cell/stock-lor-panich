@@ -2124,6 +2124,8 @@ function getAdminSheets() {
 
 // ✅ expose เฉพาะ public actions ที่ inline handler ยังจำเป็นต้องใช้
 Object.assign(window, {
+  openPendingDeliverySheet,
+  closePendingDeliverySheet,
   openChangePasswordSheet,
   submitChangePassword,
   cancelAdminLogin,
@@ -5374,6 +5376,45 @@ async function refreshProductsWithFeedback({
     }
   }
 }
+
+function openPendingDeliverySheet() {
+  pendingDeliverySheet.innerHTML = `
+    <div class="admin-sheet-topbar">
+      <button
+        class="btn btn-outline back-btn"
+        onclick="closePendingDeliverySheet()">
+        ← กลับ
+      </button>
+
+      <h3>
+        <span class="dashboard-title-main">
+          📦 ค้างส่ง
+        </span>
+      </h3>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:600;">
+        ยังไม่มีรายการ
+      </div>
+
+      <div
+        style="
+          margin-top:8px;
+          color:rgba(235,235,245,.72);
+          font-size:14px;
+        ">
+        ระบบจะแสดงรายการค้างส่งที่นี่
+      </div>
+    </div>
+  `;
+
+  openOverlay(pendingDeliverySheet);
+} 
+
+function closePendingDeliverySheet() {
+  closeOverlay(pendingDeliverySheet);
+} 
  
 function openMainMenu(triggerEl){
   const adminValid =

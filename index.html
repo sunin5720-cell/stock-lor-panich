@@ -2910,9 +2910,6 @@ async function fetchStockLogs() {
   return json.data;
 }
 
-
-  
-
 async function fetchOrders(){
   if (!state.admin.token) {
     throw new Error("Not authenticated");
@@ -4417,9 +4414,24 @@ function getOrderDateValue(order) {
 
 function isOrderInRange(order, fromYmd, toYmd) {
   const raw = getOrderDateValue(order);
+
+ console.log(
+   "ORDER DATE:",
+   order.orderId,
+   raw
+ );
+ 
   if (!raw) return false;
 
   const d = new Date(raw);
+
+ console.log(
+   "PARSED:",
+   order.orderId,
+   d,
+   Number.isNaN(d.getTime())
+ ); 
+ 
   if (Number.isNaN(d.getTime())) return false;
 
   const orderYmd = toYmdLocal(d);
@@ -4547,6 +4559,15 @@ async function openAdminDashboard(mode = "SUMMARY", force = false) {
       const status = String(o.status || "").toUpperCase();
       return status === "APPROVED" && isOrderInRange(o, from, to);
     });
+
+   console.log(
+  "APPROVED ORDERS",
+  approvedOrders.map(o => ({
+    orderId: o.orderId,
+    status: o.status,
+    createdAt: o.createdAt
+  }))
+);
 
     const pendingOrders = (Array.isArray(state.admin.orders)
       ? state.admin.orders

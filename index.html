@@ -5196,6 +5196,9 @@ createPendingDeliverySheet.dataset.poNumber =
 createPendingDeliverySheet.dataset.productId =
   productId;
 
+createPendingDeliverySheet.dataset.orderedQty =
+   Number(maxQty) || 0; 
+
 createPendingDeliverySheet.innerHTML = `
   
  <div
@@ -5309,6 +5312,11 @@ async function createPendingDelivery() {
     const productId =
       createPendingDeliverySheet.dataset.productId;
 
+    const orderedQty =
+      Number(
+        createPendingDeliverySheet.dataset.orderedQty
+      ) || 0;
+
     const qty = Number(
       document.getElementById(
         "pendingQtyInput"
@@ -5373,6 +5381,11 @@ async function createPendingDelivery() {
       productId
     );
 
+ form.append(
+   "orderedQty",
+   orderedQty
+ );
+   
     form.append(
       "qty",
       qty
@@ -5789,9 +5802,15 @@ function renderPendingDeliveries(list) {
    ${item.createdBy || "-"}
  </div>
 
-      <div class="stock">
-        จำนวน ${Number(item.qty || 0)}
-      </div>
+ <div class="stock">
+   จำนวนใน PO :
+   ${Number(item.orderedQty || 0)}
+ </div>
+
+ <div class="stock">
+   ค้างส่ง :
+   ${Number(item.qty || 0)}
+ </div>
 
 <div class="stock">
  <span

@@ -2072,6 +2072,10 @@ border: 1px solid rgba(255,255,255,.16);
       role="dialog"
       aria-modal="true"
       tabindex="-1"></div>
+<div
+  id="createPendingDeliverySheet"
+  class="sheet">
+</div>
 <!-- 🔹 Main Menu (Side Sheet Right) -->
 <div id="mainMenuSheet" class="side-menu" role="dialog" aria-modal="true" tabindex="-1"></div>
 
@@ -2085,6 +2089,10 @@ border: 1px solid rgba(255,255,255,.16);
 /* ================= STEP 2: ประกาศ backdrop (UPGRADED) ================= */
 const backdrop = document.getElementById("globalBackdrop");
 const cartSheet = document.getElementById("cartSheet");
+const createPendingDeliverySheet =
+  document.getElementById(
+    "createPendingDeliverySheet"
+  ); 
   
 // ✅ SINGLE SOURCE OF TRUTH: sheet refs (กัน ReferenceError + กันพึ่ง global id)
 const productSheet = document.getElementById("productSheet");
@@ -5054,8 +5062,6 @@ async function openStockTimeline(force = false) {
   }
 }
 
-
-
 function openAdminOrder(orderId){
   // 🔒 A6 GUARD: ห้ามเปิด Admin Order UI ถ้าไม่ได้อยู่ admin หรือ session ไม่พร้อม
   if (
@@ -5088,8 +5094,39 @@ function openAdminOrder(orderId){
 
     ${items.map(i => `
       <div class="cart-item">
-        <div>${i.name} x ${i.qty}</div>
-        <div>฿${i.price * i.qty}</div>
+   <div>
+     <div>${i.name} x ${i.qty}</div>
+
+     ${
+       order.status !== "PENDING" &&
+       order.status !== "REJECTED"
+       ? `
+       <button
+         class="btn btn-outline"
+         style="
+           margin-top:8px;
+           width:auto;
+           padding:8px 12px;
+           font-size:13px;
+         "
+         onclick="
+           openCreatePendingDelivery(
+             '${order.orderId}',
+             '${String(order.poNumber || "").replace(/'/g,"\\'")}',
+             '${String(i.productId || "").replace(/'/g,"\\'")}',
+             ${Number(i.qty) || 0}
+           )
+         ">
+         📦 ค้างส่ง
+       </button>
+       `
+       : ""
+     }
+
+   </div>
+ <div>
+   ฿${(Number(i.price) || 0) * (Number(i.qty) || 0)}
+ </div>
       </div>
     `).join("")}
 
@@ -5122,6 +5159,107 @@ function openAdminOrder(orderId){
   openOverlay(adminOrderSheet);
 }
 
+function openCreatePendingDelivery(
+  orderId,
+  poNumber,
+  productId,
+  maxQty
+) {
+
+createPendingDeliverySheet.dataset.orderId =
+  orderId;
+
+createPendingDeliverySheet.dataset.poNumber =
+  poNumber;
+
+createPendingDeliverySheet.dataset.productId =
+  productId;
+
+createPendingDeliverySheet.innerHTML = `
+  
+ <div
+   id="pendingDeliveryMeta"
+   data-order-id="${orderId}"
+   data-po-number="${poNumber}"
+   data-product-id="${productId}"
+ ></div>
+
+    <div class="admin-sheet-topbar">
+
+      <button
+        class="btn btn-outline"
+        onclick="
+          closeOverlay(
+            createPendingDeliverySheet
+          )
+        ">
+        ← กลับ
+      </button>
+
+      <h3>📦 เพิ่มรายการค้างส่ง</h3>
+
+    </div>
+
+    <div class="card">
+
+      <div>
+        <b>สินค้า:</b>
+        ${productId}
+      </div>
+
+      <div style="margin-top:8px;">
+        <b>จำนวนใน PO:</b>
+        ${Number(maxQty) || 0}
+      </div>
+
+      <div style="margin-top:16px;">
+
+        <label>
+          จำนวนค้างส่ง
+        </label>
+
+        <input
+          id="pendingQtyInput"
+          type="number"
+          min="1"
+          max="${maxQty}"
+          value="1"
+          class="input"
+        />
+
+      </div>
+
+      <div style="margin-top:12px;">
+
+        <label>
+          หมายเหตุ
+        </label>
+
+        <textarea
+          id="pendingNoteInput"
+          class="input"
+          placeholder="เช่น รอของเข้า / รอรอบผลิต"
+          rows="3"></textarea>
+
+      </div>
+
+      <button
+        class="btn"
+        style="
+          margin-top:16px;
+          width:100%;
+        ">
+        บันทึก
+      </button>
+
+    </div>
+  `;
+
+  openOverlay(
+    createPendingDeliverySheet
+  );
+}
+ 
 async function handleApprove() {
   // 🔒 GUARD: ต้องอยู่ใน admin mode และมี order
   if (state.mode !== "admin" || !state.admin.selectedOrder) return;
@@ -5497,8 +5635,9 @@ function renderPendingDeliveries(list) {
      ${
        item.status === "OPEN"
        ? `
-       <button
-         class="btn"
+ <button
+   id="savePendingDeliveryBtn"
+   class="btn"
          style="
            margin-top:12px;
            width:100%;

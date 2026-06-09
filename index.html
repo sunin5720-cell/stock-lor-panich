@@ -5285,7 +5285,7 @@ createPendingDeliverySheet.innerHTML = `
 
     </div>
 
-    <div class="card">
+      <div class="card" style="margin-top:12px;">
 
       <div>
         <b>สินค้า:</b>
@@ -5299,9 +5299,9 @@ createPendingDeliverySheet.innerHTML = `
 
       <div style="margin-top:16px;">
 
-        <label>
-          จำนวนค้างส่ง
-        </label>
+<label class="stock">
+  จำนวนค้างส่ง
+</label>
 
         <input
           id="pendingQtyInput"
@@ -5328,15 +5328,15 @@ createPendingDeliverySheet.innerHTML = `
 
       </div>
 
-      <button
-        onclick="createPendingDelivery()"
-        class="btn btn-primary"
-        style="
-          margin-top:16px;
-          width:100%;
-        ">
-        บันทึก
-      </button>
+<button
+  onclick="createPendingDelivery()"
+  class="btn btn-primary"
+  style="
+    margin-top:16px;
+    width:100%;
+  ">
+  บันทึก
+</button>
 
     </div>
   `;

@@ -2005,6 +2005,45 @@ border: 1px solid rgba(255,255,255,.16);
   transform: translateX(-50%) translateY(1px) scale(.97);
 }
 
+.input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+
+  background:rgba(255,255,255,.04);
+
+  border:1px solid rgba(255,255,255,.08);
+
+  color:#fff;
+
+  font-size:15px;
+}
+
+.input:focus{
+  outline:none;
+
+  border-color:#0A84FF;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(10,132,255,.18);
+}
+
+textarea.input{
+  resize:vertical;
+  min-height:90px;
+}
+
+.btn-primary{
+  background:#0A84FF;
+  color:#fff;
+  border:none;
+}
+
+.btn-primary:hover{
+  filter:brightness(1.05);
+} 
+ 
 /* ================= CONTINUE MODE (ADMIN ADD PRODUCT) ================= */
 /* 🔴 FIX: กันข้อความ "เพิ่มต่อเนื่อง..." ชิดขอบ/ไม่ wrap ในมือถือ */
 #adminAddProductSheet .continue-row{
@@ -5291,7 +5330,7 @@ createPendingDeliverySheet.innerHTML = `
 
       <button
         onclick="createPendingDelivery()"
-        class="btn"
+        class="btn btn-primary"
         style="
           margin-top:16px;
           width:100%;

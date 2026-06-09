@@ -4402,6 +4402,28 @@ function toYmdLocal(value) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+function formatThaiDate(value) {
+
+  if (!value) return "-";
+
+  const d = new Date(value);
+
+  if (Number.isNaN(d.getTime())) {
+    return String(value);
+  }
+
+  return d.toLocaleString(
+    "th-TH",
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  );
+}
+ 
 function getOrderDateValue(order) {
   return (
     order?.createdAt ||
@@ -5781,76 +5803,90 @@ function renderPendingDeliveries(list) {
   }
 
   container.innerHTML = list.map(item => `
+
     <div class="card">
 
-<div class="name">
+      <div class="name">
         📦 PO: ${item.poNumber || "-"}
       </div>
 
- <div class="stock">
-   สินค้า:
-   ${item.productId || "-"}
- </div>
-
- <div class="stock">
-   วันที่:
-   ${item.createdAt || "-"}
- </div>
-
- <div class="stock">
-   ผู้สร้าง:
-   ${item.createdBy || "-"}
- </div>
-
- <div class="stock">
-   จำนวนใน PO :
-   ${Number(item.orderedQty || 0)}
- </div>
-
- <div class="stock">
-   ค้างส่ง :
-   ${Number(item.qty || 0)}
- </div>
-
-<div class="stock">
- <span
-   class="
-     status
-     ${
-       item.status === "OPEN"
-       ? "warehouse"
-       : "ready"
-     }
-   ">
-   ${
-     item.status === "OPEN"
-     ? "OPEN"
-     : "CLOSED"
-   }
- </span>
+      <div class="stock">
+        สินค้า:
+        ${item.productId || "-"}
       </div>
 
-     ${
-       item.status === "OPEN"
-       ? `
- <button
-   class="btn btn-secondary"
-         style="
-           margin-top:12px;
-           width:100%;
-         "
-         onclick="
-           markPendingDelivered(
-             '${item.pendingId}'
-           )
-         ">
-         ✅ ส่งครบแล้ว
-       </button>
-       `
-       : ""
-     }      
+      <div class="stock">
+        จำนวนใน PO :
+        ${Number(item.orderedQty || 0)}
+      </div>
+
+      <div class="stock">
+        ค้างส่ง :
+        ${Number(item.qty || 0)}
+      </div>
+
+      <div class="stock">
+        วันที่:
+        ${
+          item.createdAt
+            ? new Date(item.createdAt)
+                .toLocaleDateString(
+                  "th-TH",
+                  {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                  }
+                )
+            : "-"
+        }
+      </div>
+
+      <div class="stock">
+        ผู้สร้าง:
+        ${item.createdBy || "-"}
+      </div>
+
+      <div class="stock">
+        <span
+          class="
+            status
+            ${
+              item.status === "OPEN"
+                ? "warehouse"
+                : "ready"
+            }
+          ">
+          ${
+            item.status === "OPEN"
+              ? "OPEN"
+              : "CLOSED"
+          }
+        </span>
+      </div>
+
+      ${
+        item.status === "OPEN"
+          ? `
+          <button
+            class="btn btn-secondary"
+            style="
+              margin-top:12px;
+              width:100%;
+            "
+            onclick="
+              markPendingDelivered(
+                '${item.pendingId}'
+              )
+            ">
+            ✅ ส่งครบแล้ว
+          </button>
+          `
+          : ""
+      }
 
     </div>
+
   `).join("");
 }
 
